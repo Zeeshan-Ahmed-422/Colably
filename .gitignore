@@ -1,0 +1,23 @@
+node_modules/
+dist/
+build/
+
+# secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+
+# logs / caches
+*.log
+.DS_Store
+.vscode/
+.idea/
+coverage/
+.cache/
+
+# uploaded user content
+server/uploads/*
+!server/uploads/.gitkeep
