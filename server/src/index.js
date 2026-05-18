@@ -10,8 +10,10 @@ const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 
 const server = http.createServer(app);
 
+// Same multi-origin handling as the Express CORS layer
+const allowedOrigins = CLIENT_ORIGIN.split(',').map((s) => s.trim()).filter(Boolean);
 const io = new SocketServer(server, {
-  cors: { origin: CLIENT_ORIGIN, credentials: true },
+  cors: { origin: allowedOrigins, credentials: true },
 });
 
 registerChatSocket(io);

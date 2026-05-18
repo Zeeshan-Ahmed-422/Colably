@@ -19,9 +19,20 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// CLIENT_ORIGIN may be a single URL or a comma-separated list so we can allow
+// both the local Vite dev server and the deployed static site at the same time.
+const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    origin(origin, cb) {
+      // Allow non-browser tools (curl/postman) and any whitelisted origin
+      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error(`CORS blocked: ${origin}`));
+    },
     credentials: true,
   })
 );

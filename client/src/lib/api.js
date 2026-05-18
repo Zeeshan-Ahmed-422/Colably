@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+// In dev: VITE_API_URL is unset, so baseURL is just '/api' and the Vite proxy
+// forwards it to the local backend. In production: VITE_API_URL is set at build
+// time (e.g. https://collably-api.onrender.com) and we hit it directly.
+const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   withCredentials: false,
 });
 
