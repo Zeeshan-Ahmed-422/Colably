@@ -12,6 +12,5 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
-  },
-  "authors": ["Abdullah Khan", "Zeeshan Ahmad"]
+  }
 }

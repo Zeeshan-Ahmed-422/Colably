@@ -1,7 +1,5 @@
 # Collably — Influencer Campaign Collaboration Platform
 
-> Built by **Abdullah Khan** & **Zeeshan Ahmad**.
->
 > A modular PERN platform where **brands post campaigns**, **influencers apply or get invited**,
 > and both sides track **deliverables** and **chat in real-time** until the work is shipped.
 
