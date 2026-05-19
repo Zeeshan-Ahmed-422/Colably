@@ -83,3 +83,48 @@ export const login = asyncHandler(async (req, res) => {
 export const me = asyncHandler(async (req, res) => {
   res.json({ user: publicUser(req.user) });
 });
+
+// POST /api/auth/register-admin
+// Lets a visitor self-register as admin IF they know the invite code.
+// Code lives in env (ADMIN_INVITE_CODE); falls back to a default so the
+// project works out of the box. Change the env var on production to lock down.
+export const registerAdmin = asyncHandler(async (req, res) => {
+  const { name, email, password, inviteCode } = req.body;
+
+  if (!name || !email || !password || !inviteCode) {
+    res.status(400);
+    throw new Error('Missing required fields');
+  }
+  if (password.length < 6) {
+    res.status(400);
+    throw new Error('Password must be at least 6 characters');
+  }
+
+  const expected = process.env.ADMIN_INVITE_CODE || 'collably-admin-invite';
+  if (inviteCode !== expected) {
+    res.status(403);
+    throw new Error('Invalid admin invite code');
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+  if (existing) {
+    res.status(409);
+    throw new Error('Email already registered');
+  }
+
+  const hash = await bcrypt.hash(password, 10);
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email: email.toLowerCase(),
+      password: hash,
+      role: 'admin',
+    },
+    include: { handles: true },
+  });
+
+  res.status(201).json({
+    user: publicUser(user),
+    token: signToken(user.id),
+  });
+});
