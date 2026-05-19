@@ -31,8 +31,12 @@ export default function ChatPanel({ collaborationId, counterpartName }) {
     socket.emit('collab:join', collaborationId, () => {});
 
     const onNew = (msg) => {
-      if (msg.collaboration === collaborationId || msg.collaboration?._id === collaborationId) {
-        setMessages((prev) => [...prev, msg]);
+      // Prisma flat field is `collaborationId`. We're already joined to the
+      // collab room, but double-check to avoid stale events from a previous
+      // room appending to the wrong list.
+      if (msg.collaborationId === collaborationId || msg.collaboration?._id === collaborationId) {
+        // De-dupe in case the server ack and broadcast race
+        setMessages((prev) => (prev.some((m) => m._id === msg._id) ? prev : [...prev, msg]));
       }
     };
     const onTyping = ({ userId, isTyping }) => {
